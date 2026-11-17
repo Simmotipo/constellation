@@ -23,6 +23,100 @@
   }
 }
 
+@keyframes coronaRotateCW {
+  0% {
+    transform: rotate(0deg) scale(0.96);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.05);
+  }
+  100% {
+    transform: rotate(360deg) scale(0.96);
+  }
+}
+
+@keyframes coronaRotateCCW {
+  0% {
+    transform: rotate(360deg) scale(1.04);
+  }
+  50% {
+    transform: rotate(180deg) scale(0.95);
+  }
+  100% {
+    transform: rotate(0deg) scale(1.04);
+  }
+}
+
+@keyframes stellarBreath {
+  0%, 100% {
+    transform: scale(0.97);
+    opacity: 0.82;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+
+@keyframes flareShimmer {
+  0%, 100% {
+    transform: scaleX(0.92) scaleY(0.95);
+    opacity: 0.78;
+  }
+  50% {
+    transform: scaleX(1.08) scaleY(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes pulsarWave {
+  0% {
+    transform: scale(0.45);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+
+@keyframes companionFloat {
+  0%, 100% {
+    transform: translate3d(0px, 0px, 0);
+  }
+  50% {
+    transform: translate3d(2px, -2.5px, 0);
+  }
+}
+
 .animate-fadeIn {
   animation: fadeIn 180ms ease-out forwards;
+}
+
+.animate-corona-cw {
+  animation: coronaRotateCW 22s linear infinite;
+}
+
+.animate-corona-ccw {
+  animation: coronaRotateCCW 28s linear infinite;
+}
+
+.animate-corona-fast {
+  animation: coronaRotateCW 9s linear infinite;
+}
+
+.animate-stellar-breath {
+  animation: stellarBreath 4.2s ease-in-out infinite;
+}
+
+.animate-flare-shimmer {
+  animation: flareShimmer 3.4s ease-in-out infinite;
+}
+
+.animate-pulsar-wave {
+  animation: pulsarWave 2.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.animate-companion-float {
+  animation: companionFloat 4.5s ease-in-out infinite;
 }

@@ -600,13 +600,12 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({
                 onSelectTag(selectedTag === cluster.tag ? null : cluster.tag);
               }}
               style={{
-                transform: `translate3d(${cluster.centerX}px, ${
-                  cluster.centerY - cluster.radius + 18
-                }px, 0)`,
+                left: `${cluster.centerX}px`,
+                top: `${cluster.centerY - cluster.radius + 18}px`,
                 borderColor: `${cluster.color}40`,
                 color: cluster.color,
               }}
-              className={`absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 px-3 py-1 rounded-full bg-slate-950/75 backdrop-blur-md border font-mono text-[11px] uppercase tracking-[0.2em] hover:scale-105 transition-all shadow-lg ${
+              className={`absolute -translate-x-1/2 -translate-y-1/2 whitespace-nowrap px-3 py-1 rounded-full bg-slate-950/75 backdrop-blur-md border font-mono text-[11px] uppercase tracking-[0.2em] hover:scale-105 transition-all shadow-lg ${
                 isClusterActive ? 'opacity-90' : 'opacity-20'
               }`}
             >
