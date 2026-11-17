@@ -78,6 +78,21 @@
       "hasSecondary": true,
       "primaryLabel": "Primary (-a)",
       "secondaryLabel": "Secondary (-b)"
+    },
+    {
+      "id": "puppis-mwkm80wo",
+      "name": "Oracle Free MV",
+      "starName": "Zeta Puppis",
+      "starSlug": "puppis",
+      "tags": [
+        "cloud",
+        "vm",
+        "ssh"
+      ],
+      "astralType": "ringed-planet",
+      "hasSecondary": true,
+      "primaryLabel": "Primary (-a)",
+      "secondaryLabel": "Secondary (-b)"
     }
   ]
 }
