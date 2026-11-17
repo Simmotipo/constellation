@@ -4,7 +4,10 @@ import {
   EndpointHealth,
   PositionedStar,
 } from '../types/constellation';
-import { generateAmbientStarfield } from '../utils/universeLayout';
+import {
+  generateAmbientStarfield,
+  generateDeepSpaceNebulae,
+} from '../utils/universeLayout';
 import { StarNode } from './StarNode';
 
 export interface CameraState {
@@ -58,7 +61,22 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({
     origY: number;
   } | null>(null);
 
-  const ambientStars = useMemo(() => generateAmbientStarfield(240), []);
+  const ambientStars = useMemo(() => generateAmbientStarfield(340), []);
+  const deepNebulae = useMemo(() => generateDeepSpaceNebulae(), []);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
+
+  const layer1Stars = useMemo(
+    () => ambientStars.filter((s) => s.layer === 1),
+    [ambientStars]
+  );
+  const layer2Stars = useMemo(
+    () => ambientStars.filter((s) => s.layer === 2),
+    [ambientStars]
+  );
+  const layer3Stars = useMemo(
+    () => ambientStars.filter((s) => s.layer === 3),
+    [ambientStars]
+  );
 
   useEffect(() => {
     const updateSize = () => {
@@ -112,6 +130,16 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isPanning && !draggingStar && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+      const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+      setTilt({
+        rx: Number((-ny * 2.2).toFixed(2)),
+        ry: Number((nx * 2.6).toFixed(2)),
+      });
+    }
+
     if (draggingStar) {
       const dx = (e.clientX - draggingStar.startClientX) / camera.zoom;
       const dy = (e.clientY - draggingStar.startClientY) / camera.zoom;
@@ -220,29 +248,48 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({
         draggingStar ? 'cursor-grabbing' : isPanning ? 'cursor-grabbing' : 'cursor-grab'
       }`}
       style={{
+        perspective: '1400px',
         background:
-          'radial-gradient(ellipse at 50% 45%, #0a1128 0%, #050814 55%, #020308 100%)',
+          'radial-gradient(ellipse at 50% 42%, #0c1433 0%, #050816 52%, #010206 100%)',
       }}
     >
-      {/* Subtle Deep-Space Atmospheric Backlight */}
+      {/* HDR Deep-Space Atmospheric & Milky Way Backlight */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-60"
+        className="pointer-events-none absolute inset-0 opacity-90 mix-blend-screen"
         style={{
           background:
-            'radial-gradient(circle at 20% 25%, rgba(56, 189, 248, 0.08) 0%, transparent 45%), radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.08) 0%, transparent 50%), radial-gradient(circle at 55% 20%, rgba(251, 191, 36, 0.05) 0%, transparent 40%)',
+            'radial-gradient(circle at 18% 22%, rgba(56, 189, 248, 0.16) 0%, transparent 45%), radial-gradient(circle at 82% 72%, rgba(192, 132, 252, 0.16) 0%, transparent 48%), radial-gradient(circle at 52% 18%, rgba(251, 191, 36, 0.08) 0%, transparent 42%), radial-gradient(ellipse at 50% 50%, rgba(99, 102, 241, 0.09) 0%, transparent 65%)',
         }}
       />
 
-      {/* Parallax Ambient Starfield Layer */}
+      {/* Far Deep-Field Parallax Layer 1 (0.08x) — Distant Pinpricks & Deep Nebulae */}
       <div
         className="pointer-events-none absolute left-1/2 top-1/2"
         style={{
-          transform: `translate3d(${-camera.x * 0.22}px, ${-camera.y * 0.22}px, 0) scale(${
-            0.85 + camera.zoom * 0.15
+          transform: `translate3d(${-camera.x * 0.08}px, ${-camera.y * 0.08}px, 0) scale(${
+            0.88 + camera.zoom * 0.12
           })`,
         }}
       >
-        {ambientStars.map((bg) => (
+        {deepNebulae
+          .filter((n) => n.layer === 1)
+          .map((n) => (
+            <div
+              key={`neb-1-${n.id}`}
+              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl mix-blend-screen"
+              style={{
+                left: n.x,
+                top: n.y,
+                width: n.width,
+                height: n.height,
+                opacity: n.opacity,
+                transform: `translate(-50%, -50%) rotate(${n.rotation}deg)`,
+                background: `radial-gradient(ellipse at 40% 45%, ${n.primaryColor} 0%, ${n.secondaryColor} 45%, transparent 74%)`,
+              }}
+            />
+          ))}
+
+        {layer1Stars.map((bg) => (
           <div
             key={bg.id}
             className="absolute rounded-full animate-pulse"
@@ -255,20 +302,116 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({
               opacity: bg.opacity,
               animationDuration: `${bg.twinkleDuration}s`,
               animationDelay: `${bg.twinkleDelay}s`,
-              boxShadow: bg.layer === 3 ? `0 0 6px ${bg.tint}` : undefined,
             }}
           />
         ))}
       </div>
 
-      {/* Main World Coordinate Plane */}
+      {/* Mid-Space Parallax Layer 2 (0.22x) — Ionized Nebulae & Medium Stars */}
       <div
-        className="absolute left-1/2 top-1/2 origin-center will-change-transform"
+        className="pointer-events-none absolute left-1/2 top-1/2"
         style={{
-          transform: `scale(${camera.zoom}) translate3d(${-camera.x}px, ${-camera.y}px, 0)`,
+          transform: `translate3d(${-camera.x * 0.22}px, ${-camera.y * 0.22}px, 0) scale(${
+            0.85 + camera.zoom * 0.15
+          })`,
         }}
       >
-        {/* SVG Astronomical Grid, Nebulae, and Constellation Connecting Lines */}
+        {deepNebulae
+          .filter((n) => n.layer === 2)
+          .map((n) => (
+            <div
+              key={`neb-2-${n.id}`}
+              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl mix-blend-screen"
+              style={{
+                left: n.x,
+                top: n.y,
+                width: n.width,
+                height: n.height,
+                opacity: n.opacity,
+                transform: `translate(-50%, -50%) rotate(${n.rotation}deg)`,
+                background: `radial-gradient(ellipse at 55% 45%, ${n.primaryColor} 0%, ${n.secondaryColor} 48%, transparent 75%)`,
+              }}
+            />
+          ))}
+
+        {layer2Stars.map((bg) => (
+          <div
+            key={bg.id}
+            className="absolute rounded-full animate-pulse"
+            style={{
+              left: bg.x,
+              top: bg.y,
+              width: bg.size,
+              height: bg.size,
+              backgroundColor: bg.tint,
+              opacity: bg.opacity,
+              animationDuration: `${bg.twinkleDuration}s`,
+              animationDelay: `${bg.twinkleDelay}s`,
+              boxShadow: `0 0 4px ${bg.tint}`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Near-Field Foreground Parallax Layer 3 (0.45x) — HDR Flare Stars */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-1/2"
+        style={{
+          transform: `translate3d(${-camera.x * 0.45}px, ${-camera.y * 0.45}px, 0) scale(${
+            0.82 + camera.zoom * 0.22
+          })`,
+        }}
+      >
+        {layer3Stars.map((bg) => (
+          <div
+            key={bg.id}
+            className="absolute flex items-center justify-center animate-pulse"
+            style={{
+              left: bg.x,
+              top: bg.y,
+              width: bg.size,
+              height: bg.size,
+              opacity: bg.opacity,
+              animationDuration: `${bg.twinkleDuration}s`,
+              animationDelay: `${bg.twinkleDelay}s`,
+            }}
+          >
+            <div
+              className="w-full h-full rounded-full"
+              style={{
+                backgroundColor: bg.tint,
+                boxShadow: `0 0 8px 1px ${bg.tint}`,
+              }}
+            />
+            {bg.hasFlare && (
+              <>
+                <div
+                  className="absolute w-7 h-[1px] opacity-65"
+                  style={{
+                    background: `linear-gradient(90deg, transparent, ${bg.tint}, transparent)`,
+                  }}
+                />
+                <div
+                  className="absolute h-7 w-[1px] opacity-65"
+                  style={{
+                    background: `linear-gradient(180deg, transparent, ${bg.tint}, transparent)`,
+                  }}
+                />
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Main 3D-Tilted World Coordinate Plane */}
+      <div
+        className="absolute left-1/2 top-1/2 origin-center will-change-transform transition-transform duration-150 ease-out"
+        style={{
+          transformStyle: 'preserve-3d',
+          transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) scale(${camera.zoom}) translate3d(${-camera.x}px, ${-camera.y}px, 0)`,
+        }}
+      >
+        {/* SVG Astronomical Grid, HDR Nebulae, and Constellation Connecting Lines */}
         <svg
           width="4800"
           height="3600"
@@ -278,32 +421,62 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({
           <defs>
             {clusters.map((cluster, idx) => (
               <radialGradient key={cluster.tag} id={`nebula-grad-${idx}`} cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor={cluster.color} stopOpacity="0.16" />
-                <stop offset="55%" stopColor={cluster.color} stopOpacity="0.05" />
+                <stop offset="0%" stopColor={cluster.color} stopOpacity="0.28" />
+                <stop offset="35%" stopColor={cluster.color} stopOpacity="0.14" />
+                <stop offset="70%" stopColor={cluster.color} stopOpacity="0.04" />
                 <stop offset="100%" stopColor={cluster.color} stopOpacity="0" />
               </radialGradient>
             ))}
+            <radialGradient id="galacticCoreGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.45" />
+              <stop offset="22%" stopColor="#38bdf8" stopOpacity="0.22" />
+              <stop offset="55%" stopColor="#818cf8" stopOpacity="0.08" />
+              <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+            </radialGradient>
           </defs>
 
-          {/* Polar Astronomical Coordinate Rings around Origin (0,0) */}
-          {[350, 700, 1050, 1400].map((r) => (
-            <circle
-              key={r}
-              cx={0}
-              cy={0}
-              r={r}
-              fill="none"
-              stroke="rgba(148, 163, 184, 0.06)"
-              strokeWidth={1}
-              strokeDasharray="6 10"
-            />
+          {/* Central Galactic Core Anchor at (0,0) */}
+          <circle cx={0} cy={0} r={140} fill="url(#galacticCoreGrad)" />
+          <circle
+            cx={0}
+            cy={0}
+            r={18}
+            fill="none"
+            stroke="rgba(56, 189, 248, 0.35)"
+            strokeWidth={1.2}
+          />
+          <circle cx={0} cy={0} r={3.5} fill="#e0f2fe" />
+
+          {/* 3D-Perspective Elliptical Orbital Rings & Polar Coordinate Grid */}
+          {[360, 720, 1080, 1440].map((r, i) => (
+            <g key={r}>
+              <circle
+                cx={0}
+                cy={0}
+                r={r}
+                fill="none"
+                stroke="rgba(148, 163, 184, 0.08)"
+                strokeWidth={1}
+                strokeDasharray="6 10"
+              />
+              <ellipse
+                cx={0}
+                cy={0}
+                rx={r * 1.15}
+                ry={r * 0.42}
+                transform={`rotate(${i % 2 === 0 ? -14 : 11} 0 0)`}
+                fill="none"
+                stroke="rgba(56, 189, 248, 0.05)"
+                strokeWidth={1}
+              />
+            </g>
           ))}
           <line
             x1={-2000}
             y1={0}
             x2={2000}
             y2={0}
-            stroke="rgba(148, 163, 184, 0.05)"
+            stroke="rgba(148, 163, 184, 0.06)"
             strokeWidth={1}
           />
           <line
@@ -311,11 +484,11 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({
             y1={-1500}
             x2={0}
             y2={1500}
-            stroke="rgba(148, 163, 184, 0.05)"
+            stroke="rgba(148, 163, 184, 0.06)"
             strokeWidth={1}
           />
 
-          {/* Constellation Clusters: Nebulae, Sector Boundaries & Connecting Lines */}
+          {/* Constellation Clusters: HDR Nebulae, Sector Boundaries & Connecting Lines */}
           {clusters.map((cluster, idx) => {
             const isClusterActive =
               !selectedTag ||
@@ -328,16 +501,29 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({
               <g
                 key={cluster.tag}
                 style={{
-                  opacity: isClusterActive ? 1 : 0.18,
+                  opacity: isClusterActive ? 1 : 0.16,
                   transition: 'opacity 300ms ease',
                 }}
               >
-                {/* Soft Nebula Glow */}
+                {/* Volumetric HDR Nebula Glow */}
                 <circle
                   cx={cluster.centerX}
                   cy={cluster.centerY}
-                  r={cluster.radius * 1.35}
+                  r={cluster.radius * 1.45}
                   fill={`url(#nebula-grad-${idx})`}
+                />
+
+                {/* Outer 3D Inclined Sector Halo */}
+                <ellipse
+                  cx={cluster.centerX}
+                  cy={cluster.centerY}
+                  rx={cluster.radius * 1.06}
+                  ry={cluster.radius * 0.86}
+                  transform={`rotate(-12 ${cluster.centerX} ${cluster.centerY})`}
+                  fill="none"
+                  stroke={cluster.color}
+                  strokeOpacity={0.14}
+                  strokeWidth={1}
                 />
 
                 {/* Constellation Sector Ring */}
@@ -347,35 +533,46 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({
                   r={cluster.radius}
                   fill="none"
                   stroke={cluster.color}
-                  strokeOpacity={0.18}
-                  strokeWidth={1.2}
+                  strokeOpacity={0.24}
+                  strokeWidth={1.3}
                   strokeDasharray="4 8"
                 />
 
-                {/* Constellation Connecting Lines */}
+                {/* HDR Luminous Constellation Connecting Lines */}
                 {cluster.edges.map((edge, edgeIdx) => (
                   <g key={edgeIdx}>
-                    {/* Outer glow line */}
+                    {/* Wide HDR bloom */}
                     <line
                       x1={edge.from.x}
                       y1={edge.from.y}
                       x2={edge.to.x}
                       y2={edge.to.y}
                       stroke={cluster.color}
-                      strokeOpacity={0.22}
-                      strokeWidth={4}
+                      strokeOpacity={0.14}
+                      strokeWidth={10}
                       strokeLinecap="round"
                     />
-                    {/* Crisp inner line */}
+                    {/* Mid glow line */}
                     <line
                       x1={edge.from.x}
                       y1={edge.from.y}
                       x2={edge.to.x}
                       y2={edge.to.y}
                       stroke={cluster.color}
+                      strokeOpacity={0.35}
+                      strokeWidth={3.2}
+                      strokeLinecap="round"
+                    />
+                    {/* Crisp incandescent core filament */}
+                    <line
+                      x1={edge.from.x}
+                      y1={edge.from.y}
+                      x2={edge.to.x}
+                      y2={edge.to.y}
+                      stroke="#ffffff"
                       strokeOpacity={0.55}
-                      strokeWidth={1.5}
-                      strokeDasharray="6 4"
+                      strokeWidth={1.1}
+                      strokeDasharray="6 5"
                       strokeLinecap="round"
                     />
                   </g>

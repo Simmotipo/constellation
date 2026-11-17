@@ -97,12 +97,15 @@ export const StarNode: React.FC<StarNodeProps> = ({
       {/* Binary Companion Orbit Track & Secondary (-b) Companion Star */}
       {service.hasSecondary && urls.secondaryUrl && (
         <>
-          {/* Orbit Ellipse */}
+          {/* 3D-Inclined Orbit Ellipse */}
           <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-20 rounded-full border border-dashed pointer-events-none transition-all duration-300"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-20 rounded-full border border-dashed pointer-events-none transition-all duration-300"
             style={{
-              borderColor: showExpanded ? 'rgba(251, 191, 36, 0.55)' : 'rgba(148, 163, 184, 0.25)',
-              transform: 'translate(-50%, -50%) rotate(-18deg)',
+              borderColor: showExpanded ? 'rgba(251, 191, 36, 0.65)' : 'rgba(148, 163, 184, 0.28)',
+              boxShadow: showExpanded
+                ? '0 0 18px rgba(251, 191, 36, 0.2), inset 0 0 12px rgba(251, 191, 36, 0.12)'
+                : undefined,
+              transform: 'translate(-50%, -50%) rotate(-18deg) rotateX(48deg)',
             }}
           />
 
@@ -174,13 +177,16 @@ export const StarNode: React.FC<StarNodeProps> = ({
           }`}
         >
           <div
-            className={`w-full rounded-xl backdrop-blur-md transition-all duration-200 ${
+            className={`w-full rounded-xl backdrop-blur-xl transition-all duration-200 ${
               showExpanded
-                ? 'bg-slate-950/95 border border-slate-600/80 shadow-[0_12px_40px_rgba(0,0,0,0.85)] p-3'
-                : 'bg-slate-950/80 border border-slate-800/90 hover:border-slate-700/90 shadow-[0_4px_20px_rgba(0,0,0,0.65)] px-3 py-1.5'
+                ? 'bg-slate-950/95 border border-slate-500/80 p-3'
+                : 'bg-slate-950/80 border border-slate-800/90 hover:border-slate-600/90 px-3 py-1.5'
             }`}
             style={{
               borderColor: showExpanded ? meta.accent : undefined,
+              boxShadow: showExpanded
+                ? `0 16px 48px rgba(0,0,0,0.9), 0 0 28px ${meta.accent}35, inset 0 1px 0 rgba(255,255,255,0.22)`
+                : `0 6px 24px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.1)`,
             }}
           >
             {/* Header Row: Service Name & Star Code */}

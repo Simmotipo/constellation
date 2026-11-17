@@ -174,10 +174,33 @@ export interface BackgroundStar {
   layer: 1 | 2 | 3;
   twinkleDuration: number;
   twinkleDelay: number;
+  hasFlare: boolean;
 }
 
-export function generateAmbientStarfield(count = 240): BackgroundStar[] {
-  const tints = ['#ffffff', '#e0f2fe', '#fef3c7', '#f3e8ff', '#bae6fd', '#fde68a'];
+export interface DeepSpaceNebula {
+  id: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+  primaryColor: string;
+  secondaryColor: string;
+  opacity: number;
+  layer: 1 | 2;
+}
+
+export function generateAmbientStarfield(count = 340): BackgroundStar[] {
+  const tints = [
+    '#ffffff',
+    '#e0f2fe',
+    '#7dd3fc',
+    '#fef3c7',
+    '#fde68a',
+    '#f3e8ff',
+    '#c4b5fd',
+    '#fecdd3',
+  ];
   const stars: BackgroundStar[] = [];
 
   for (let i = 0; i < count; i++) {
@@ -185,14 +208,27 @@ export function generateAmbientStarfield(count = 240): BackgroundStar[] {
     const h2 = hashString(`bg-star-y-${i}`);
     const h3 = hashString(`bg-star-meta-${i}`);
 
-    const x = ((h1 % 3600) - 1800);
-    const y = ((h2 % 2600) - 1300);
-    const layer = ((i % 3) + 1) as 1 | 2 | 3;
-    const size = layer === 1 ? 1.1 : layer === 2 ? 1.7 : 2.5;
-    const opacity = 0.2 + ((h3 % 65) / 100);
+    const x = (h1 % 4200) - 2100;
+    const y = (h2 % 3000) - 1500;
+    // Weight more stars into far deep-field layer 1, fewer into foreground layer 3
+    const layerRoll = i % 10;
+    const layer: 1 | 2 | 3 = layerRoll < 5 ? 1 : layerRoll < 8 ? 2 : 3;
+    const size =
+      layer === 1
+        ? 0.9 + (h3 % 6) * 0.1
+        : layer === 2
+        ? 1.5 + (h3 % 8) * 0.12
+        : 2.2 + (h3 % 10) * 0.15;
+    const opacity =
+      layer === 1
+        ? 0.18 + (h3 % 45) / 100
+        : layer === 2
+        ? 0.35 + (h3 % 50) / 100
+        : 0.55 + (h3 % 40) / 100;
     const tint = tints[h3 % tints.length];
-    const twinkleDuration = 3 + (h3 % 5);
-    const twinkleDelay = (h1 % 40) / 10;
+    const twinkleDuration = 2.8 + (h3 % 6);
+    const twinkleDelay = (h1 % 50) / 10;
+    const hasFlare = layer === 3 && h3 % 7 === 0;
 
     stars.push({
       id: i,
@@ -204,8 +240,74 @@ export function generateAmbientStarfield(count = 240): BackgroundStar[] {
       layer,
       twinkleDuration,
       twinkleDelay,
+      hasFlare,
     });
   }
 
   return stars;
+}
+
+export function generateDeepSpaceNebulae(): DeepSpaceNebula[] {
+  return [
+    {
+      id: 1,
+      x: -560,
+      y: -320,
+      width: 980,
+      height: 620,
+      rotation: -22,
+      primaryColor: 'rgba(56, 189, 248, 0.22)',
+      secondaryColor: 'rgba(99, 102, 241, 0.14)',
+      opacity: 0.75,
+      layer: 1,
+    },
+    {
+      id: 2,
+      x: 540,
+      y: -240,
+      width: 900,
+      height: 580,
+      rotation: 18,
+      primaryColor: 'rgba(192, 132, 252, 0.22)',
+      secondaryColor: 'rgba(236, 72, 153, 0.12)',
+      opacity: 0.7,
+      layer: 1,
+    },
+    {
+      id: 3,
+      x: -360,
+      y: 340,
+      width: 860,
+      height: 520,
+      rotation: 14,
+      primaryColor: 'rgba(244, 63, 94, 0.16)',
+      secondaryColor: 'rgba(251, 191, 36, 0.11)',
+      opacity: 0.65,
+      layer: 2,
+    },
+    {
+      id: 4,
+      x: 420,
+      y: 310,
+      width: 920,
+      height: 560,
+      rotation: -16,
+      primaryColor: 'rgba(45, 212, 191, 0.16)',
+      secondaryColor: 'rgba(56, 189, 248, 0.12)',
+      opacity: 0.65,
+      layer: 2,
+    },
+    {
+      id: 5,
+      x: 0,
+      y: -40,
+      width: 1450,
+      height: 460,
+      rotation: -12,
+      primaryColor: 'rgba(129, 140, 248, 0.12)',
+      secondaryColor: 'rgba(56, 189, 248, 0.08)',
+      opacity: 0.55,
+      layer: 1,
+    },
+  ];
 }
