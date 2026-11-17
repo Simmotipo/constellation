@@ -124,12 +124,15 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({
     }
 
     if (!isPanning || !panStartRef.current) return;
-    const dx = (e.clientX - panStartRef.current.clientX) / camera.zoom;
-    const dy = (e.clientY - panStartRef.current.clientY) / camera.zoom;
+    const { clientX: startX, clientY: startY, camX, camY } = panStartRef.current;
+    const dx = (e.clientX - startX) / camera.zoom;
+    const dy = (e.clientY - startY) / camera.zoom;
+    const nextX = camX - dx;
+    const nextY = camY - dy;
     onCameraChange((prev) => ({
       ...prev,
-      x: panStartRef.current!.camX - dx,
-      y: panStartRef.current!.camY - dy,
+      x: nextX,
+      y: nextY,
     }));
   };
 
@@ -153,14 +156,20 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({
   };
   const handleTouchMove = (e: React.TouchEvent) => {
     if (e.touches.length === 1 && touchStartRef.current) {
-      const dx = (e.touches[0].clientX - touchStartRef.current.x) / camera.zoom;
-      const dy = (e.touches[0].clientY - touchStartRef.current.y) / camera.zoom;
+      const { x: startX, y: startY, camX, camY } = touchStartRef.current;
+      const dx = (e.touches[0].clientX - startX) / camera.zoom;
+      const dy = (e.touches[0].clientY - startY) / camera.zoom;
+      const nextX = camX - dx;
+      const nextY = camY - dy;
       onCameraChange((prev) => ({
         ...prev,
-        x: touchStartRef.current!.camX - dx,
-        y: touchStartRef.current!.camY - dy,
+        x: nextX,
+        y: nextY,
       }));
     }
+  };
+  const handleTouchEnd = () => {
+    touchStartRef.current = null;
   };
 
   const handleStartDragStar = (serviceId: string, e: React.MouseEvent) => {
@@ -205,6 +214,8 @@ export const UniverseCanvas: React.FC<UniverseCanvasProps> = ({
       onMouseLeave={handleMouseUp}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
       className={`relative w-full h-screen overflow-hidden select-none ${
         draggingStar ? 'cursor-grabbing' : isPanning ? 'cursor-grabbing' : 'cursor-grab'
       }`}
