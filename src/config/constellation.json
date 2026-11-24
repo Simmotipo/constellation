@@ -102,8 +102,8 @@
       "primaryLabel": "Primary (-a)",
       "secondaryLabel": "Secondary (-b)",
       "position": {
-        "x": 300,
-        "y": -92
+        "x": -5,
+        "y": 206
       }
     },
     {
@@ -116,103 +116,6 @@
         "https"
       ],
       "astralType": "red-dwarf",
-      "hasSecondary": true,
-      "primaryLabel": "Primary (-a)",
-      "secondaryLabel": "Secondary (-b)"
-    }
-  ]
-}{
-  "title": "CONSTELLATION",
-  "subtitle": "Deep-Space Cloud Service Telemetry & Tunnel Gateway",
-  "defaultDomain": "rakico.net",
-  "protocol": "https",
-  "openInNewTab": true,
-  "services": [
-    {
-      "id": "orionis-mwklggrq",
-      "name": "Proxmox",
-      "starName": "Gamma Orionis",
-      "starSlug": "orionis",
-      "tags": [
-        "vm",
-        "https",
-        "proxmox"
-      ],
-      "astralType": "blue-giant",
-      "hasSecondary": true,
-      "primaryLabel": "Primary (-a)",
-      "secondaryLabel": "Secondary (-b)"
-    },
-    {
-      "id": "centauri-mwklgy06",
-      "name": "Pi SSH",
-      "starName": "Beta Cephei",
-      "starSlug": "cephei",
-      "tags": [
-        "pi",
-        "ssh"
-      ],
-      "astralType": "golden-star",
-      "hasSecondary": false,
-      "primaryLabel": "Primary (-a)",
-      "secondaryLabel": "Secondary (-b)"
-    },
-    {
-      "id": "cephei-mwklit56",
-      "name": "Prox Debian SSH Jumphost",
-      "starName": "Alpha Centauri",
-      "starSlug": "centuari",
-      "tags": [
-        "vm",
-        "ssh",
-        "proxmox"
-      ],
-      "astralType": "pulsar",
-      "hasSecondary": true,
-      "primaryLabel": "Primary (-a)",
-      "secondaryLabel": "Secondary (-b)"
-    },
-    {
-      "id": "draconis-mwklknet",
-      "name": "SJ Test MC VM",
-      "starName": "Delta Draconis",
-      "starSlug": "draconis",
-      "tags": [
-        "vm",
-        "ssh",
-        "proxmox"
-      ],
-      "astralType": "nebula-core",
-      "hasSecondary": true,
-      "primaryLabel": "Primary (-a)",
-      "secondaryLabel": "Secondary (-b)"
-    },
-    {
-      "id": "lyrae-mwklo1wd",
-      "name": "Home Assistant",
-      "starName": "Epsilon Lyrae",
-      "starSlug": "lyrae",
-      "tags": [
-        "vm",
-        "https",
-        "proxmox"
-      ],
-      "astralType": "red-dwarf",
-      "hasSecondary": true,
-      "primaryLabel": "Primary (-a)",
-      "secondaryLabel": "Secondary (-b)"
-    },
-    {
-      "id": "puppis-mwkm80wo",
-      "name": "Oracle Free MV",
-      "starName": "Zeta Puppis",
-      "starSlug": "puppis",
-      "tags": [
-        "cloud",
-        "vm",
-        "ssh"
-      ],
-      "astralType": "ringed-planet",
       "hasSecondary": true,
       "primaryLabel": "Primary (-a)",
       "secondaryLabel": "Secondary (-b)"
